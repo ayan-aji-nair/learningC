@@ -8,6 +8,10 @@ typedef struct node {
 
 void print_list(node_t * first) {
         node_t * current = first;
+        if(current == NULL) {
+                printf("NULL");
+                return;
+        }
         while(current != NULL) {
                 if(current->next != NULL) {
                         printf("%d->", current->val);
@@ -63,6 +67,31 @@ node_t * create_new_node(int val) {
         return new_node;
 }
 
+void delete_value(node_t ** first, int val) {
+        node_t * current = *first;
+        // if the first node is null then do nothing
+        if(current == NULL) {
+                return;
+        }
+        // if the value is in the first node then remove the first node
+        if(current->val == val) {
+                free(current);
+                // if the next node is not null, then set the next node
+                // to be the new first node
+                if(current->next != NULL) {
+                        *first = current->next;
+                }
+        }
+        while(current->next != NULL) {
+                if(current->next->val == val) {
+                        node_t * temp = current->next;
+                        current->next = temp->next;
+                        free(temp);
+                }
+                current = current->next;
+        }
+}
+
 int main() {
         /*
          * MANUAL INSERT
@@ -91,10 +120,29 @@ int main() {
         print_list(first);
         add_to_front(&first, -2);
         printf("\n");
+        printf("after adding to front: ");
         print_list(first);
+        printf("\n");
+        printf("after deleting 3: ");
+        delete_value(&first, 3);
+        print_list(first);
+        printf("\n");
 
         node_t * null_list = NULL;
-        add_to_front(&null_list, 150);
-        printf("\n");
+        printf("before inserting: ");
         print_list(null_list);
+        printf("\n");
+        printf("after inserting 50: ");
+        add_to_end(&null_list, 50);
+        print_list(null_list);
+        printf("\n");
+        delete_value(&null_list, 50);
+        printf("after deleting 50: ");
+        print_list(null_list);
+        printf("\n");
+        /*
+        printf("after deleting 0: ");
+        delete_value(&null_list, 0);
+        print_list(null_list);
+        */
 }
