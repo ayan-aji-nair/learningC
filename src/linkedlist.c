@@ -28,9 +28,10 @@ void add_to_end(node_t ** first, int to_add) {
         node_t * current = *first;
         // create the node that we want to add
         node_t * new_node = (node_t *) malloc(sizeof(node_t));
+        new_node->next = NULL;
         new_node->val = to_add;
         // if the first node is null
-        if(current == NULL) {
+        if(*first == NULL) {
                 *first = new_node;
                 return;
         }
@@ -47,6 +48,7 @@ void add_to_front(node_t ** first, int to_add) {
         // two cases - first node empty and first node not empty
         // but first we have to create our new node
         node_t * new_node = (node_t *) malloc(sizeof(node_t));
+        new_node->next = NULL;
         new_node->val = to_add;
         // now we deal w case 1: the first node is empty
         if(*first == NULL) {
@@ -64,7 +66,45 @@ void add_to_front(node_t ** first, int to_add) {
 node_t * create_new_node(int val) {
         node_t * new_node = (node_t *) malloc(sizeof(node_t));
         new_node->val = val;
+        new_node->next = NULL;
         return new_node;
+}
+
+void add_after_idx(node_t ** first, int toAdd, int idx) {
+        node_t * current = *first;
+        node_t * toInsert = create_new_node(toAdd);
+        if(idx == 0) {
+                node_t * next = current->next;
+                current->next = toInsert;
+                return;
+        }
+        int i;
+        for(i = 0; i < idx; i++) {
+                if(current->next != NULL) {
+                        current = current->next;
+                }
+                else {
+                        return;
+                }
+        }
+        node_t * temp = current->next;
+        current->next = toInsert;
+        toInsert->next = temp;
+}
+
+void delete_first(node_t ** first) {
+        if((*first) == NULL) {
+                return;
+        }
+        if((*first)->next == NULL) {
+                node_t * temp = *first;
+                *first = NULL;
+                free(temp);
+                return;
+        }
+        node_t * temp = (*first);
+        *first = (*first)->next;
+        free(temp);
 }
 
 void delete_value(node_t ** first, int val) {
@@ -75,21 +115,94 @@ void delete_value(node_t ** first, int val) {
         }
         // if the value is in the first node then remove the first node
         if(current->val == val) {
-                free(current);
                 // if the next node is not null, then set the next node
                 // to be the new first node
-                if(current->next != NULL) {
-                        *first = current->next;
-                }
+                delete_first(first);
+                return;
         }
+        // otherwise we want to look through the list
         while(current->next != NULL) {
+                // if we find a value in the linked list equal to the value we 
+                // want to delete, then delete it and end
                 if(current->next->val == val) {
                         node_t * temp = current->next;
                         current->next = temp->next;
                         free(temp);
                 }
+                // advance the pointer
                 current = current->next;
         }
+}
+
+/*
+void delete_value(node_t ** head, int val) {
+    node_t *previous, *current;
+
+    if (*head == NULL) {
+            return;
+    }
+
+    if ((*head)->val == val) {
+            node_t * temp = (*head);
+            (*head) = (*head)->next;
+            free(temp);
+    }
+    previous = *head;
+    current = (*head)->next;
+    while (current) {
+        if (current->val == val) {
+            previous->next = current->next;
+            free(current);
+        }
+        previous = current;
+        current  = current->next;
+    }
+}
+*/
+
+void delete_idx(node_t ** first, int idx) {
+        node_t * current = *first;
+        // do nothing if the current node is null
+        if(current == NULL) {
+                return;
+        }
+        // two cases: idx in front and idx not in front
+        // if the index is in front, then just delete the first nodd
+        if(idx == 0) {
+                *first = current->next;
+                free(current);
+                return;
+        }
+        // otherwise we scan through list up to the node before the index
+        // we want to delete
+        int i;
+        for(i = 0; i < idx - 1; i++) {
+               // only continue while there is a next node to scan
+               // otherwise end the program
+               if(current->next != NULL){
+                        current = current->next;
+               }
+               else {
+                       return;
+               }
+        }
+        // delete the middle node temp
+        node_t * temp = current->next;
+        current->next = temp->next;
+        free(temp);
+}
+
+void reverse(node_t ** first) {
+        node_t * prev = NULL;
+        node_t * current = *first;
+        node_t * next = NULL;
+        while(current != NULL) {
+                next = current->next;
+                current->next = prev;
+                prev = current;
+                current = next;
+        }
+        *first = prev;
 }
 
 int main() {
@@ -127,6 +240,27 @@ int main() {
         delete_value(&first, 3);
         print_list(first);
         printf("\n");
+        printf("after reversing the list: ");
+        reverse(&first);
+        print_list(first);
+        printf("\n");
+        printf("after inserting value 11 at index 2: ");
+        add_after_idx(&first, 11, 6);
+        print_list(first);
+        printf("\n");
+        printf("after deleting first: ");
+        delete_first(&first);
+        print_list(first);
+        printf("\n");
+        /*
+        int j;
+        for(j=5; j >=  0; j--) {
+                printf("after deleting index %d: ", j);
+                delete_idx(&first, j);
+                print_list(first);
+                printf("\n");
+        }
+        */
 
         node_t * null_list = NULL;
         printf("before inserting: ");
@@ -142,6 +276,8 @@ int main() {
         printf("\n");
         /*
         printf("after deleting 0: ");
+        
+        
         delete_value(&null_list, 0);
         print_list(null_list);
         */
