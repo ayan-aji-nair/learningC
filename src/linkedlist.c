@@ -1,11 +1,6 @@
+#include "linkedlist.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-
-typedef struct node {
-       int val;
-       struct node * next;
-} node_t;
 
 bool isEmpty(node_t * first) {
         if(first == NULL) {
