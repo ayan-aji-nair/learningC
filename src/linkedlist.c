@@ -1,10 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct node {
        int val;
        struct node * next;
 } node_t;
+
+bool isEmpty(node_t * first) {
+        if(first == NULL) {
+                return true;
+        }
+        return false;
+}
 
 void print_list(node_t * first) {
         node_t * current = first;
@@ -80,6 +88,27 @@ void add_after_idx(node_t ** first, int toAdd, int idx) {
         }
         int i;
         for(i = 0; i < idx; i++) {
+                if(current->next != NULL) {
+                        current = current->next;
+                }
+                else {
+                        return;
+                }
+        }
+        node_t * temp = current->next;
+        current->next = toInsert;
+        toInsert->next = temp;
+}
+
+void add_before_idx(node_t ** first, int toAdd, int idx) {
+        node_t * current = *first;
+        node_t * toInsert = create_new_node(toAdd);
+        if(idx == 0) {
+                toInsert->next = current;
+                *first = toInsert;
+        }
+        int i;
+        for(i = 0; i < idx - 1; i++) {
                 if(current->next != NULL) {
                         current = current->next;
                 }
@@ -244,8 +273,12 @@ int main() {
         reverse(&first);
         print_list(first);
         printf("\n");
-        printf("after inserting value 11 at index 2: ");
-        add_after_idx(&first, 11, 6);
+        printf("after inserting value 11 after index 2: ");
+        add_after_idx(&first, 11, 2);
+        print_list(first);
+        printf("\n");
+        printf("after inserting value 12 before index 2: ");
+        add_before_idx(&first, 12, 2);
         print_list(first);
         printf("\n");
         printf("after deleting first: ");
