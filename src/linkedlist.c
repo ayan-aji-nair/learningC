@@ -136,6 +136,24 @@ void delete_first(node_t ** first) {
         free(temp);
 }
 
+void delete_last(node_t ** first) {
+        if((*first) == NULL) {
+                return;
+        }
+        if((*first)->next == NULL) {
+                delete_first(first);
+                return;
+        }
+        node_t * current = *first;
+        node_t * prev = NULL;
+        while(current->next != NULL) {
+                prev = current;
+                current = current->next;
+        }
+        prev->next = current->next;
+        free(current);
+}
+
 void delete_value(node_t ** first, int val) {
         node_t * current = *first;
         // if the first node is null then do nothing
@@ -283,6 +301,10 @@ int main() {
         printf("\n");
         printf("after deleting first: ");
         delete_first(&first);
+        print_list(first);
+        printf("\n");
+        printf("after deleting last: ");
+        delete_last(&first);
         print_list(first);
         printf("\n");
         /*
